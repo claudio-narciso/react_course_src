@@ -11,15 +11,19 @@ export default function App() {
     const [step, setStep] = useState(1);
     const [isOpen, setOpen] = useState(true);
 
+    // The correct way of changing a state is to use a callback function instead of updating the variable directly
     function handlePrevious() {
-        step > 0 && setStep(step - 1);
+        // step > 0 && setStep(step - 1);
+        step > 0 && setStep((e) => e - 1);  // Short-circuit
     }
     function handleNext() {
-        step < messages.length && setStep(step + 1);
+        if (step < messages.length) {
+            setStep((e) => e + 1)
+        }
     }
     
     return (
-        <div>
+        <>
             <button className="close" onClick={() => setOpen(!isOpen)}>&times;</button>
             { isOpen && (
                 <div className="steps">
@@ -37,6 +41,6 @@ export default function App() {
                     </div>
                 </div>
             )}
-        </div>
+        </>
     )
 }
