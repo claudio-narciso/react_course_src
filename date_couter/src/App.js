@@ -1,8 +1,9 @@
 import { useState } from "react";
+import "./styles.css";
 
 export default function App() {
   return (
-    <div>
+    <div className="App">
       <Buttons/>
     </div>
 
@@ -13,21 +14,27 @@ function Buttons({name}) {
   const [count, setCount] = useState(0);
   const [steps, setSteps] = useState(1);
 
+  // Get initial date and set the gap based in count value.
   const today = new Date();
-
   today.setDate(today.getDate() + count);
+
+  function handleReset() {
+    setCount(0);
+    setSteps(1);
+  }
 
   return (
     <div>
+      {/* Range input */}
       <div>
-        <button onClick={() => setSteps((e) => e - 1)}> - </button>
+        <input type="range" min="1" max="20" value={steps} onChange={(e) => setSteps(Number(e.target.value))} />
         <span>Steps : {steps}</span>
-        <button onClick={() => setSteps((e) => e + 1)}> + </button>
       </div>
 
+      {/* Input Count and increase and decrease buttons */}
       <div>
         <button onClick={() => setCount(count - steps)}> - </button>
-        <span>Count : {count}</span>
+        <input type="text" name="count" value={count} onInput={(e) => setCount(Number(e.target.value))}/>
         <button onClick={() => setCount(count + steps)}> + </button>
       </div>
 
@@ -41,6 +48,13 @@ function Buttons({name}) {
       }
       {today.toDateString()}
       </span>
+
+      {/* Reset button que só aparece quando não estamos no estado padrão */}
+      {steps !== 1 || count !== 0 ? (
+        <div>
+          <button onClick={handleReset}>Reset</button>
+        </div>
+      ) : null}
     </div>
   )
 }
