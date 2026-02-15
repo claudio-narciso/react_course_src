@@ -3,16 +3,35 @@ import {useState} from "react";
 
 const initialItems = [
   { id: 1, description: "Passports", quantity: 2, packed: false },
-  { id: 2, description: "Socks", quantity: 12, packed: true },
+  { id: 2, description: "Bording pass", quantity: 2, packed: false },
+  { id: 3, description: "Socks", quantity: 12, packed: true },
 ];
 
 export default function App() {
+
+  const [items, setItems] = useState(initialItems)
+
+  // TODO: Syntax a vérificar 
+  function handleAddItem(item) {
+    setItems((items) => [...items, item]);
+  }
+
+  function handleRemoveItem(id) {
+    setItems((items) => items.filter((e) => e.id !== id))
+  }
+
+  function handlePackItem(id) {
+    setItems(items => items.map(item => item.id === id ? {...item, packed: !item.packed} : item))
+  }
+
+  console.log(items)
+
   return (
     <div className="app">
       <Logo />
-      <Form />
-      <PackinList />
-      <Stats />
+      <Form handleAddItem={handleAddItem}/>
+      <PackinList items={items} handleRemoveItem={handleRemoveItem} handlePackItem={handlePackItem}/>
+      <Stats items={items} />
     </div>
   )
 }
@@ -21,7 +40,8 @@ function Logo() {
   return <h1>🌴 Far Away 💼</h1>
 }
 
-function Form() {
+function Form({ handleAddItem }) {
+
 
   // Destructuring do resultado do state que é um valor e uma função que nos permite mudar o valor de forma dinamica.
   // 
@@ -31,7 +51,13 @@ function Form() {
   function handleSubmit(e) {
     e.preventDefault();
 
-    // TODO: consele the selected data and reset the fields. Create a new item basically. Based on the objet above.
+    const newItem = {id: Date.now(), description, quantity, packed: false};
+    console.log(newItem)
+
+    handleAddItem(newItem);
+
+    setDescription("");
+    setQuantity(1);
   }
 
   return (
@@ -49,33 +75,40 @@ function Form() {
   );
 }
 
-function PackinList() {
+function PackinList({ items, handleRemoveItem, handlePackItem }) {
   return (
     <div className="list">
       <ul>
       {
-        initialItems.map(item => <Item item={item} key={item.id}/>)
+        items.map(item => <Item item={item} handleRemoveItem={handleRemoveItem} handlePackItem={handlePackItem} key={item.id}/>)
       }
       </ul>
     </div>
   );
 }
 
-function Item({item}) {
+function Item({ item, handleRemoveItem, handlePackItem }) {
+
   return (
     <li style={item.packed ? {textDecoration: "line-through"} : {} }>
-      <span>
-        {item.quantity} {item.description}
-      </span>
-      <button>❌</button>
+      <input type="checkbox" id={item.id} checked={item.packed} onChange={() => handlePackItem(item.id)} />
+      <label for={item.id}>
+        <span>{item.quantity} {item.description}</span>
+      </label>
+      <button onClick={() => handleRemoveItem(item.id)}>❌</button>
     </li>
   )
 }
 
-function Stats() {
+function Stats({ items }) {
+  const numItems = items.length;
+  const numPackedItems = items.filter(item => item.packed).length;
+  const packedPercentage = (numPackedItems / numItems * 100).toFixed(2);
+  
+
   return (
     <footer className="stats">
-      <em>💼 You have X items on you list, and you already packed X (X%)</em>
+      <em>💼 You have {numItems} items on you list, and you already packed {numPackedItems} ({packedPercentage}%)</em>
     </footer>
   );
 }
