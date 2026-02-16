@@ -24,13 +24,17 @@ export default function App() {
     setItems(items => items.map(item => item.id === id ? {...item, packed: !item.packed} : item))
   }
 
+  function handleClearAll() {
+    setItems([]);
+  }
+
   console.log(items)
 
   return (
     <div className="app">
       <Logo />
       <Form handleAddItem={handleAddItem}/>
-      <PackinList items={items} handleRemoveItem={handleRemoveItem} handlePackItem={handlePackItem}/>
+      <PackinList items={items} handleRemoveItem={handleRemoveItem} handlePackItem={handlePackItem} handleClearAll={handleClearAll}/>
       <Stats items={items} />
     </div>
   )
@@ -75,14 +79,33 @@ function Form({ handleAddItem }) {
   );
 }
 
-function PackinList({ items, handleRemoveItem, handlePackItem }) {
+function PackinList({ items, handleRemoveItem, handlePackItem, handleClearAll }) {
+  const [sortBy, setSortBy] = useState("input");
+
+  let sortedItems;
+  if(sortBy === "input") {
+    sortedItems = items;
+  } else if(sortBy === "description") {
+    sortedItems = items.slice().sort((a, b) => a.description.localeCompare(b.description));
+  } else if(sortBy == "packed") {
+    sortedItems = items.slice().sort((a, b) => a.packed - b.packed)
+  }
+
   return (
     <div className="list">
       <ul>
       {
-        items.map(item => <Item item={item} handleRemoveItem={handleRemoveItem} handlePackItem={handlePackItem} key={item.id}/>)
+        sortedItems.map(item => <Item item={item} handleRemoveItem={handleRemoveItem} handlePackItem={handlePackItem} key={item.id}/>)
       }
       </ul>
+      <div class="actions">
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+          <option value="input">Sort by input order</option>
+          <option value="description">Sort by description</option>
+          <option value="packed">Sort by packed status</option>
+        </select>
+        <button onClick={handleClearAll}>Clear All</button>
+      </div>
     </div>
   );
 }
