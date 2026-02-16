@@ -28,24 +28,53 @@ export default function App() {
 }
 
 function Accordion() {
+  const [selectedId, setSelectedId] = useState(null);
+
+  function handleSelectedId(id) {
+    setSelectedId(selectedId == id ? null : id);
+  }
+
   return (
     <div className="accordion">
       {faqs.map((item, index) => (
-        <AccordionItem number={index + 1} title={item.title} text={item.text} key={index + 1}/>
+        <AccordionItem
+          number={index + 1}
+          title={item.title}
+          handleSelectedId={handleSelectedId}
+          selectedId={selectedId}
+          key={index + 1}
+        >
+          {item.text}
+        </AccordionItem>
       ))}
+      {/* Um pequeno exemplo do uso do child element. Podemos até colocar html nele e funciona. */}
+      <AccordionItem
+          number={7}
+          title="Uma cena minha só"
+          handleSelectedId={handleSelectedId}
+          selectedId={selectedId}
+          key={7}
+        >
+          Um texto do bro Cláudio só para testar a cena.
+          <ul>
+            <li>Item 1 é parte da resposta</li>
+            <li>Item 2 é parte da resposta</li>
+            <li>Item 3 é parte da resposta</li>
+          </ul>
+        </AccordionItem>
     </div>
   );
 }
 
-function AccordionItem({ number, title, text }) {
-  const [isOpen, setIsOpen] = useState(false);
+function AccordionItem({ number, title, selectedId, handleSelectedId, children }) {
+  const isOpen = (selectedId === number);
 
   return (
-    <div className={`item ${isOpen && "open"}`} onClick={() => setIsOpen(!isOpen)}>
+    <div className={`item ${isOpen && "open"}`} onClick={() => handleSelectedId(number)}>
         <p className="number">{number > 9 ? number : `0${number}`}</p> 
         <p class="title">{title}</p>
-        <span className="icon">+</span>
-        {isOpen && <div className="content-box">{text}</div>}
+        <span className="icon">{`${isOpen ? '-' : '+'}`}</span>
+        {isOpen && <div className="content-box">{children}</div>}
     </div>
   )
 }
